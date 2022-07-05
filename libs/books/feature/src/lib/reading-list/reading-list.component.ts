@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { Store } from '@ngrx/store';
-import { getReadingList, removeFromReadingList, addToReadingList } from '@tmo/books/data-access';
-import { ReadingListItem, Book } from '@tmo/shared/models';
+import { Update } from '@ngrx/entity';
+import { getReadingList, removeFromReadingList, markFinishedReadingList, addToReadingList } from '@tmo/books/data-access';
+import { Book, ReadingListItem } from '@tmo/shared/models';
+import * as moment from 'moment';
 
 @Component({
   selector: 'tmo-reading-list',
@@ -25,5 +27,19 @@ export class ReadingListComponent {
       };
       this.store.dispatch(addToReadingList({book}));
     });
+  }
+
+  markAsFinished(item) {
+  const readListItem : ReadingListItem = { ...item}
+  readListItem.finished = true;
+  readListItem.finishedDate = moment(new Date().toISOString()).format("MMMM d, YYYY");
+   const updateItems = {
+    id: readListItem.bookId,
+    changes: {
+      id: readListItem.bookId,
+      ...readListItem
+    }
+   } ;
+   this.store.dispatch(markFinishedReadingList({ update: updateItems }));
   }
 }
