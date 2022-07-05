@@ -1,14 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { Store } from '@ngrx/store';
 import {
   addToReadingList,
   clearSearch,
   getAllBooks,
   ReadingListBook,
-  searchBooks
+  searchBooks,
+  removeFromReadingList
 } from '@tmo/books/data-access';
-import { FormBuilder } from '@angular/forms';
-import { Book } from '@tmo/shared/models';
+import { Book, ReadingListItem } from '@tmo/shared/models';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'tmo-book-search',
@@ -18,17 +21,19 @@ import { Book } from '@tmo/shared/models';
 export class BookSearchComponent implements OnInit {
   books: ReadingListBook[];
 
-  searchForm = this.fb.group({
-    term: ''
-  });
+  bookeQuery: string;
+  bookeQueryUpdate = new Subject<string>();
 
   constructor(
     private readonly store: Store,
-    private readonly fb: FormBuilder
-  ) {}
-
-  get searchTerm(): string {
-    return this.searchForm.value.term;
+    private _snackbar : MatSnackBar
+  ) {
+    this.bookeQueryUpdate.pipe(
+      debounceTime(500),
+      distinctUntilChanged())
+      .subscribe(() => {
+        this.searchBooks();
+      });
   }
 
   ngOnInit(): void {
@@ -45,16 +50,24 @@ export class BookSearchComponent implements OnInit {
 
   addBookToReadingList(book: Book) {
     this.store.dispatch(addToReadingList({ book }));
+    const bookSnackbarRef = this._snackbar.open(`${book.title} added into reading list`, 'Undo', { duration : 2000 });
+    bookSnackbarRef.onAction().subscribe(() => {
+      const item: ReadingListItem = {
+        bookId: book.id,
+        ...book
+      }
+      this.store.dispatch(removeFromReadingList({item}));
+    });
   }
 
   searchExample() {
-    this.searchForm.controls.term.setValue('javascript');
+    this.bookeQuery = 'JavaScript';
     this.searchBooks();
   }
 
   searchBooks() {
-    if (this.searchForm.value.term) {
-      this.store.dispatch(searchBooks({ term: this.searchTerm }));
+    if (this.bookeQuery) {
+      this.store.dispatch(searchBooks({ term: this.bookeQuery }));
     } else {
       this.store.dispatch(clearSearch());
     }
