@@ -50,6 +50,7 @@
     "@nrwl/angular": "10.0.12",
     "core-js": "^2.5.4",
     "material-design-icons": "3.0.1",
+    "moment": "^2.29.3",
     "node-localstorage": "2.1.6",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~6.5.5",

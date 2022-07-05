@@ -45,4 +45,25 @@ describe('When: I use the reading list feature', () => {
       });
      })
   })
+
+  it('Then: I shoud finish the reading from my reading list ', () => {
+    cy.get('input[type="search"]').type('Java');
+    cy.get('[data-testing="book-item"]').should('have.length.greaterThan', 1)
+    .then(
+      () => {
+        cy.get('[data-testing="button-add-reading-list"]').first().click().then(() => {
+          cy.get('[data-testing="toggle-reading-list"]').click();
+          cy.get('[data-testing="reading-list-item"]').should('have.lengthOf.at.least', 1).then(() => {
+            cy.get('[data-testing="finish-reading"]').first().click().then(() => {
+              cy.get('.finish-date').should(
+                'have.length',
+                1
+              )
+            });
+          });
+        }); 
+      }
+    );
+  })
+
 });

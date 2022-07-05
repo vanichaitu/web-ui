@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { Store } from '@ngrx/store';
-import { getReadingList, removeFromReadingList, addToReadingList } from '@tmo/books/data-access';
-import { ReadingListItem, Book } from '@tmo/shared/models';
+import { getReadingList, removeFromReadingList, markFinishedReadingList, addToReadingList } from '@tmo/books/data-access';
+import { Book, ReadingListItem } from '@tmo/shared/models';
 
 @Component({
   selector: 'tmo-reading-list',
@@ -25,5 +25,9 @@ export class ReadingListComponent {
       };
       this.store.dispatch(addToReadingList({book}));
     });
+  }
+
+  markAsFinished(item) {
+   this.store.dispatch(markFinishedReadingList({item}));
   }
 }
