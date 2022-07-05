@@ -3,7 +3,7 @@ import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 
 import * as ReadingListActions from './reading-list.actions';
 import { ReadingListItem } from '@tmo/shared/models';
-import * as moment from 'moment';
+// import * as moment from 'moment';
 
 export const READING_LIST_FEATURE_KEY = 'readingList';
 
@@ -21,6 +21,7 @@ export const readingListAdapter: EntityAdapter<ReadingListItem> = createEntityAd
 >({
   selectId: item => item.bookId
 });
+
 
 export const initialState: State = readingListAdapter.getInitialState({
   loaded: false,
@@ -54,12 +55,9 @@ const readingListReducer = createReducer(
   on(ReadingListActions.removeFromReadingList, (state, action) =>
     readingListAdapter.removeOne(action.item.bookId, state)
   ),
-  on(ReadingListActions.markFinishedReadingList, (state, action) =>
-    readingListAdapter.updateOne({ id: action.item.bookId, changes:{ 
-      finished: true,
-      finishedDate: moment(new Date().toISOString()).format("MMMM d, YYYY"),
-       ...action.item }}, state)
-  )
+  on(ReadingListActions.markFinishedReadingList, (state, { update }) => {
+    return readingListAdapter.updateOne(update, state);
+  })
 );
 
 export function reducer(state: State | undefined, action: Action) {
