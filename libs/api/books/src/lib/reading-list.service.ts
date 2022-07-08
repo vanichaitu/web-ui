@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { StorageService } from '@tmo/shared/storage';
 import { Book, ReadingListItem } from '@tmo/shared/models';
-
-const KEY = '[okreads API] Reading List';
+import { KEY } from './constants'
 
 @Injectable()
 export class ReadingListService {
